@@ -2,10 +2,11 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import gab.opencv.*;
 import processing.video.*;
+// import processing.serial.*;
 import java.awt.*;
 
-import sprites.*;
-import sprites.utils.*;
+// import sprites.*;
+// import sprites.utils.*;
 
 import java.util.Random;
 
@@ -13,8 +14,14 @@ import java.util.Random;
 int scl = 1;
 int w = 1280;
 int h = 800;
+int w_sm = 640;
+int h_sm = 480;
 
-int fps = 5;
+// int w_bad = 1280;
+// int h_bad = 720;
+// 
+int fps = 30;
+int fps2 = 15;
 
 // SimpleOpenNI kinect;
 // boolean kinectIsOn = false;
@@ -24,6 +31,7 @@ int fps = 5;
 PFont font = createFont("PFDinTextCompPro-Medium", 23 / scl, true); 
 
 Capture video;
+Capture video2;
 OpenCV opencv;
 
 // List of my Face objects (persistent)
@@ -37,12 +45,11 @@ int faceCount = 0;
 
 PImage border_image;
 
-StopWatch sw = new StopWatch();
-
 PImage spritesheet;
 int DIM_X = 5;
 int DIM_Y = 8;
-int LAST_FRAME = 30;
+int START_TEXT = 20;
+int LAST_FRAME = 39;
 PImage[] cloud_anim = new PImage[DIM_X*DIM_Y];
 
 Random r = new Random();
@@ -73,7 +80,7 @@ void setup() {
 	// 	cloud_anim[i] = spritesheet.get(x, y, W, H);
 	// }
 
-	frameRate(5);
+	// frameRate(fps);
 
 	size(w, h);
 	background(0);
@@ -81,27 +88,31 @@ void setup() {
 	noFill();
 
 	faceList = new ArrayList<Face>();
-  	// String[] cameras = Capture.list();
 
   	border_image  = loadImage("Plenka2.png");
 
   	// frameRate(fps);
-
-	// if (cameras.length == 0) {
- //    println("There are no cameras available for capture.");
- //    exit();
- //  } else {
- //    println("Available cameras:");
- //    for (int i = 0; i < cameras.length; i++) {
- //      println(cameras[i]);
- //    }
- //  }
-
+  	String[] cameras = Capture.list();
+	if (cameras.length == 0) {
+    println("There are no cameras available for capture.");
+    exit();
+  } else {
+    println("Available cameras:");
+    for (int i = 0; i < cameras.length; i++) {
+      println(cameras[i]);
+    }
+  }
+//HD Pro Webcam C920
+//FaceTime HD Camera
+//VF0610 Live! Cam Socialize HD
+	video2 = new Capture(this, w_sm, h_sm, "VF0610 Live! Cam Socialize HD", fps2);
 	video = new Capture(this, w/scl, h/scl, "HD Pro Webcam C920", fps);
-  	opencv = new OpenCV(this, w/scl, h/scl);
+	// video_bad = new Capture(this, w_bad/scl, h_bad/scl, "VF0610 Live! Cam Socialize HD", 15);
+  	opencv = new OpenCV(this, w_sm, h_sm);
   	opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE);  
 
   	video.start();
+  	video2.start();
 
 	textFont(font);
 	textAlign(CENTER, CENTER);
@@ -116,8 +127,9 @@ void setup() {
 
 void draw() {
 	// scale(scl);
-	opencv.loadImage(video);
+	opencv.loadImage(video2);
 	image(video, 0, 0);
+	// image(video2, 1024, 0);
 	image(border_image, 0, 0);
 	// stroke(255,0,0);
 	// rect(300, 300, 350, 350);
@@ -131,9 +143,9 @@ void draw() {
 	// }
 	
 
-	// if (frameCount % 2 == 0) {
-	detectFaces();		
-	// }
+	if (frameCount % fps2/2 == 0) {
+		detectFaces();		
+	}
 
 	// Draw all the faces
 	// if (faces != null)
@@ -149,7 +161,7 @@ void draw() {
 
 	for (Face f : faceList) {
 		strokeWeight(2);
-		f.display(f.r.x - f.r.width, f.r.y - f.r.height * 2);
+		f.display(f.r.x * w/w_sm, f.r.y);
 	}
 }
 
@@ -266,22 +278,22 @@ void captureEvent(Capture c) {
 }
 
 String[] phrases = {
-	// "Я гуру программатика", 
-	// "Я играю на аукционах", 
-	// "Я знаю, чем ты занимаешься в Интернете",
-	// "Я знаю, что ты любишь",
-	// "Ай лав пис дата!",
-	// "Зацени мои KPI",
-	// "Я слежу за тобой",
-	// "Люблю отборные сегменты",
-	// "Ты в моем white list’е",
-	// "Таргетируюсь на женщин",
-	// "Умею управлять трафиком",
-	// "Обычный диджитал уже не торт",
-	// "Моя аффинитивность зашкаливает",
-	// "Мои роботы уже ищут тебя",
-	// "В моем сегменте есть место для тебя",
-	// "Знаю о тебе больше твоей мамы",
+	"Я гуру программатика", 
+	"Я играю на аукционах", 
+	"Я знаю, чем ты занимаешься в Интернете",
+	"Я знаю, что ты любишь",
+	"Ай лав пис дата!",
+	"Зацени мои KPI",
+	"Я слежу за тобой",
+	"Люблю отборные сегменты",
+	"Ты в моем white list’е",
+	"Таргетируюсь на женщин",
+	"Умею управлять трафиком",
+	"Обычный диджитал уже не торт",
+	"Моя аффинитивность зашкаливает",
+	"Мои роботы уже ищут тебя",
+	"В моем сегменте есть место для тебя",
+	"Знаю о тебе больше твоей мамы",
 	"DMP, SSP, CTR, DSP…WTF is programmatic??!!"
 };
 

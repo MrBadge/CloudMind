@@ -38,14 +38,14 @@ class Face {
   // Show me
   void display(int baseX, int baseY) {
     // fill(0,0,255,timer);
-    stroke(0,0,255);
-    rect(r.x,r.y,r.width, r.height);
+    // stroke(0,0,255);
+    // rect(r.x,r.y,r.width, r.height);
     //rect(r.x*scl,r.y*scl,r.width*scl, r.height*scl);
     // fill(255,timer*2);
-    text(""+id,r.x+10,r.y+30);
+    // text(""+id,r.x+10,r.y+30);
     //text(""+id,r.x*scl+10,r.y*scl+30);
     //text(""+id,r.x*scl+10,r.y*scl+30);
-    cloud.display(baseX, baseY);
+    cloud.display(baseX, baseY, r.width, r.height);
   }
 
   // Give me a new location / size
@@ -88,18 +88,23 @@ class Face {
       curFrame = 0;
     }
 
-    public void display(int baseX, int baseY, int w) {
-      if (curFrame <= LAST_FRAME) {
-        image(cloud_anim[curFrame], baseX + w, baseY);
-        curFrame += 2;
+    public void display(int baseX, int baseY, int w, int h) {
+      // w = 350;
+      // h = 350;
+      if (curFrame < START_TEXT) {
+        image(cloud_anim[curFrame++], baseX + w/5, baseY - 3*h/4);
       }
       else {
-        image(cloud_anim[curFrame], baseX, baseY);
+        image(cloud_anim[curFrame], baseX + w/5, baseY - 3*h/4);
         // fill(255, 0, 0);
         // rectMode(CENTER);
         fill(255, 0, 0);
-        text(msg, baseX + cloud_width / 3 - 20, baseY + cloud_height / 4, cloud_width*2/3 - 50, cloud_height*2/3 - 50);
+        text(msg, baseX, baseY, w, h);
         noFill();
+        rect(baseX, baseY, w, h);
+        // rect(baseX + w, baseY, 350, 350);
+        if (curFrame != LAST_FRAME)
+          curFrame++;
       }
     }
 
